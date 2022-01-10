@@ -8,12 +8,6 @@ import 'dart:io';
 import './bTree.dart';
 
 void main() {
-  BTree bTree = BTree(3);
-  bTree.inSert(5);
-  bTree.inSert(15);
-  bTree.inSert(25);
-  bTree.inSert(35);
-  bTree.inSert(45);
   runApp(const MyApp());
 }
 
@@ -184,49 +178,8 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-class Box {
-  // SETTING
-  final boxLinePaint = Paint()
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = 2;
-  final textStyle = TextStyle(
-    color: Colors.black,
-    fontSize: 20,
-  );
-
-  String content;
-  TextPainter? textPainter;
-  Size? size;
-  final boxPadding = 5.0;
-
-  Box(this.content, Size cSize) {
-    final textSpan = TextSpan(
-      text: content,
-      style: textStyle,
-    );
-    textPainter = TextPainter(
-      text: textSpan,
-      textDirection: TextDirection.ltr,
-    );
-    textPainter?.layout(
-      minWidth: 0,
-      maxWidth: double.infinity,
-    );
-    size = Size(textPainter!.width + 2 * boxPadding,
-        textPainter!.height + 2 * boxPadding);
-  }
-}
-
 class BTreePainter extends CustomPainter {
   // SETTING
-  final boxLinePaint = Paint()
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = 2;
-  final textStyle = TextStyle(
-    color: Colors.black,
-    fontSize: 20,
-  );
-  final boxPadding = 5.0;
   final levelDist = 70.0;
   final topMargin = 50.0;
   final sideMargin = 20.0;
@@ -240,40 +193,49 @@ class BTreePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     // draw b tree
     List<List<Node>> levels = bTree.getLevel();
-    List<List<Box>> levelBoxes = bTree
-        .getLevel()
-        .map<List<Box>>(
-            (e) => e.map<Box>((e) => Box(e.valueStr(), size)).toList())
-        .toList();
     // draw bottom first
     // 1. get bottom level total width
     double buttomWidth = -sideMargin;
-    int levelCnt = levelBoxes.length;
-    for (Box box in levelBoxes[levelCnt - 1]) {
-      buttomWidth += box.size!.width + sideMargin;
+    int levelCnt = levels.length;
+    for (Node node in levels[levelCnt - 1]) {
+      buttomWidth += node.box!.size!.width + sideMargin;
     }
     // 2. draw bottom level
     double xOff = size.width / 2 - buttomWidth / 2;
-    for (int i = 0; i < levelBoxes[levelCnt - 1].length; i++) {
+    for (int i = 0; i < levels[levelCnt - 1].length; i++) {
       double preBoxWidth =
-          (i != 0) ? levelBoxes[levelCnt - 1][i - 1].size!.width : 0;
-      Box box = levelBoxes[levelCnt - 1][i];
+          (i != 0) ? levels[levelCnt - 1][i - 1].box!.size!.width : 0;
+      Box box = levels[levelCnt - 1][i].box!;
       xOff += box.size!.width / 2;
-      drawBoxText(box.content,
-          Offset(xOff, topMargin + levelDist * (levelCnt - 1)), canvas, size);
+      box.offset = Offset(xOff, topMargin + levelDist * (levelCnt - 1));
+      drawBoxText(box, canvas, size);
       xOff += box.size!.width / 2 + sideMargin;
     }
     // 3. draw by buttom up
-    for (int i = levelCnt - 2; i >= 0; i--) {}
+    for (int i = levelCnt - 2; i >= 0; i--) {
+      // for each level
+      List<Node> thisLevel = levels[i];
+      double yOffset = topMargin + levelDist * i;
+      // for each node
+      for (int i = 0; i < thisLevel.length; i++) {
+        Node thisNode = thisLevel[i];
+        Node? firstChild = thisNode.keys[0];
+        Node? lastChild = thisNode.keys[thisNode.keys.length - 1];
+        double xOffset =
+            (firstChild!.box!.offset!.dx + lastChild!.box!.offset!.dx) / 2;
+        thisNode.box?.offset = Offset(xOffset, yOffset);
+        drawBoxText(thisNode.box!, canvas, size);
+      }
+    }
   }
 
   @override
   bool shouldRepaint(BTreePainter oldDelegate) => false;
 
-  Size drawBoxText(String t, Offset offset, Canvas canvas, Size cSize) {
+  Size drawBoxText(Box box, Canvas canvas, Size cSize) {
     final textSpan = TextSpan(
-      text: t,
-      style: textStyle,
+      text: box.content,
+      style: box.textStyle,
     );
     final textPainter = TextPainter(
       text: textSpan,
@@ -283,20 +245,23 @@ class BTreePainter extends CustomPainter {
       minWidth: 0,
       maxWidth: cSize.width,
     );
+    Offset offset = box.offset!;
     double x = offset.dx, y = offset.dy;
     x -= textPainter.width / 2;
     y -= textPainter.height / 2;
+    Offset textOffset = Offset(x, y);
+    x -= box.boxPadding / 2;
+    y -= box.boxPadding / 2;
+    Offset recOffset = Offset(x, y);
 
-    textPainter.paint(canvas, Offset(x, y));
-    x -= boxPadding / 2;
-    y -= boxPadding / 2;
     canvas.drawRect(
-        Offset(x, y) &
-            Size(textPainter.width + boxPadding,
-                textPainter.height + boxPadding),
-        boxLinePaint);
+        recOffset &
+            Size(textPainter.width + box.boxPadding,
+                textPainter.height + box.boxPadding),
+        box.boxLinePaint);
+    textPainter.paint(canvas, textOffset);
 
-    return Size((textPainter.width + boxPadding) / 2.0,
-        (textPainter.height + boxPadding) / 2.0);
+    return Size((textPainter.width + box.boxPadding) / 2.0,
+        (textPainter.height + box.boxPadding) / 2.0);
   }
 }

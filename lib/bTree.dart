@@ -159,6 +159,7 @@ class Box {
   String content;
   TextPainter? textPainter;
   Size? size;
+  Offset? offset;
   final boxPadding = 5.0;
 
   Box(
