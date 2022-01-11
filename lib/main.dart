@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
@@ -38,6 +40,7 @@ class _MyAppState extends State<MyApp> {
 
   // private method
   void setBuildTreeType(BuildTreeTypeEnum? buildTreeTypeEnum) {
+    BuildBTree(values, choosedBuildTreeType);
     setState(() {
       choosedBuildTreeType = buildTreeTypeEnum!;
     });
@@ -114,6 +117,7 @@ class _MyAppState extends State<MyApp> {
                           onChanged: (int? e) {
                             setState(() {
                               maxDegree = e!;
+                              BuildBTree(values, choosedBuildTreeType);
                             });
                           },
                           icon: const Icon(Icons.arrow_downward),
@@ -183,6 +187,9 @@ class BTreePainter extends CustomPainter {
   final levelDist = 70.0;
   final topMargin = 50.0;
   final sideMargin = 20.0;
+  final connectionlinePaint = Paint()
+    ..color = Colors.black
+    ..strokeWidth = 3.0;
 
   // state
   BTree bTree;
@@ -218,6 +225,7 @@ class BTreePainter extends CustomPainter {
       double yOffset = topMargin + levelDist * i;
       // for each node
       for (int i = 0; i < thisLevel.length; i++) {
+        // draw node box
         Node thisNode = thisLevel[i];
         Node? firstChild = thisNode.keys[0];
         Node? lastChild = thisNode.keys[thisNode.keys.length - 1];
@@ -225,6 +233,8 @@ class BTreePainter extends CustomPainter {
             (firstChild!.box!.offset!.dx + lastChild!.box!.offset!.dx) / 2;
         thisNode.box?.offset = Offset(xOffset, yOffset);
         drawBoxText(thisNode.box!, canvas, size);
+        // draw connection line to child
+        drawConnectionLine(thisNode, canvas);
       }
     }
   }
@@ -263,5 +273,37 @@ class BTreePainter extends CustomPainter {
 
     return Size((textPainter.width + box.boxPadding) / 2.0,
         (textPainter.height + box.boxPadding) / 2.0);
+  }
+
+  void drawConnectionLine(Node node, Canvas canvas) {
+    int childcnt = node.keys.length;
+    List<Offset> parentPosList = [];
+    List<Offset> childPosList = [];
+    // set parent pos list
+    double yOff = node.box!.offset!.dy + node.box!.size!.height / 2;
+    if (childcnt >= 2) {
+      for (int i = 0; i < childcnt; i++) {
+        parentPosList.add(Offset(
+            lerpDouble(
+                node.box!.offset!.dx - node.box!.size!.width / 2,
+                node.box!.offset!.dx + node.box!.size!.width / 2,
+                i / (childcnt - 1.0))!,
+            yOff));
+      }
+    } else {
+      parentPosList.add(Offset(node.box!.offset!.dx, yOff));
+    }
+
+    // set child pos list
+    for (int i = 0; i < childcnt; i++) {
+      Node cNode = node.keys[i]!;
+      childPosList.add(Offset(cNode.box!.offset!.dx,
+          cNode.box!.offset!.dy - cNode.box!.size!.height / 2));
+    }
+
+    // draw
+    for (int i = 0; i < childcnt; i++) {
+      canvas.drawLine(parentPosList[i], childPosList[i], connectionlinePaint);
+    }
   }
 }
