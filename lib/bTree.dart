@@ -41,10 +41,59 @@ class Node {
 
 class BTree {
   Node? root;
+  int order;
 
-  BTree(int order) {
+  BTree(this.order) {
     root = Node(order);
     root!.checkLeaf = true;
+  }
+
+  void bottomUp(List<int> values) {
+    // sort
+    values.sort();
+
+    // buttom nodes
+    List<Node> buttomNodes = [Node(order)];
+    buttomNodes[0].checkLeaf = true;
+    for (int i = 0; i < values.length; i++) {
+      if (buttomNodes[buttomNodes.length - 1].values.length == order - 1) {
+        // last node is full
+        buttomNodes.add(Node(order));
+        buttomNodes[buttomNodes.length - 1].checkLeaf = true;
+        buttomNodes[buttomNodes.length - 1].values.add(values[i]);
+      } else {
+        buttomNodes[buttomNodes.length - 1].values.add(values[i]);
+      }
+    }
+
+    while (true) {
+      if (buttomNodes.length != 1) {
+        // need a upper level
+        List<Node> upperNodes = [Node(order)];
+        // first child node
+        upperNodes[0].keys.add(buttomNodes[0]);
+        for (int i = 1; i < buttomNodes.length; i++) {
+          if (upperNodes[upperNodes.length - 1].values.length == order - 1) {
+            // last upper node is full
+            upperNodes.add(Node(order));
+            upperNodes[upperNodes.length - 1].keys.add(buttomNodes[i]);
+            upperNodes[upperNodes.length - 1]
+                .values
+                .add(buttomNodes[i].values[0]);
+          } else {
+            upperNodes[upperNodes.length - 1].keys.add(buttomNodes[i]);
+            upperNodes[upperNodes.length - 1]
+                .values
+                .add(buttomNodes[i].values[0]);
+          }
+        }
+        buttomNodes = upperNodes;
+      } else {
+        // root level
+        root = buttomNodes[0];
+        break;
+      }
+    }
   }
 
   void inSert(int v) {

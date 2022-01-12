@@ -30,6 +30,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  // Setting
   static const String _title = 'B+ Tree visualization';
 
   // states
@@ -40,9 +41,9 @@ class _MyAppState extends State<MyApp> {
 
   // private method
   void setBuildTreeType(BuildTreeTypeEnum? buildTreeTypeEnum) {
-    BuildBTree(values, choosedBuildTreeType);
+    buildBTree(values, buildTreeTypeEnum!);
     setState(() {
-      choosedBuildTreeType = buildTreeTypeEnum!;
+      choosedBuildTreeType = buildTreeTypeEnum;
     });
   }
 
@@ -60,7 +61,7 @@ class _MyAppState extends State<MyApp> {
           dataStr.split(" ").map<int>((e) => int.parse(e)).toList();
 
       // action of after choose file
-      BuildBTree(data, choosedBuildTreeType);
+      buildBTree(data, choosedBuildTreeType);
       setState(() {
         values = data;
       });
@@ -69,10 +70,21 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  void BuildBTree(List<int> values, BuildTreeTypeEnum buildTreeType) {
+  void buildBTree(List<int> values, BuildTreeTypeEnum buildTreeType) {
+    if (values.isEmpty) {
+      this.bTree = null;
+      return;
+    }
     BTree bTree = BTree(maxDegree);
-    for (int v in values) {
-      bTree.inSert(v);
+    switch (buildTreeType) {
+      case BuildTreeTypeEnum.oneByOne:
+        for (int v in values) {
+          bTree.inSert(v);
+        }
+        break;
+      case BuildTreeTypeEnum.bottomUp:
+        bTree.bottomUp(values);
+        break;
     }
 
     setState(() {
@@ -106,51 +118,94 @@ class _MyAppState extends State<MyApp> {
                     color: Colors.orange[200],
                     child: Column(
                       children: [
-                        const Text("Choose Max. Degree:"),
-                        DropdownButton(
-                          value: maxDegree,
-                          items: [3, 4, 5, 6, 7]
-                              .map<DropdownMenuItem<int>>((e) =>
-                                  DropdownMenuItem<int>(
-                                      value: e, child: Text('${e}')))
-                              .toList(),
-                          onChanged: (int? e) {
-                            setState(() {
-                              maxDegree = e!;
-                              BuildBTree(values, choosedBuildTreeType);
-                            });
-                          },
-                          icon: const Icon(Icons.arrow_downward),
-                          elevation: 16,
-                          style: const TextStyle(color: Colors.deepPurple),
-                          underline: Container(
-                            height: 2,
-                            color: Colors.deepPurpleAccent,
+                        Container(
+                            padding: const EdgeInsets.fromLTRB(30, 20, 20, 20),
+                            child: Row(
+                              children: [
+                                const Text(
+                                  "Choose Max. Degree:",
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.only(left: 10.0),
+                                  child: DropdownButton(
+                                    value: maxDegree,
+                                    items: [3, 4, 5, 6, 7]
+                                        .map<DropdownMenuItem<int>>((e) =>
+                                            DropdownMenuItem<int>(
+                                                value: e, child: Text('${e}')))
+                                        .toList(),
+                                    onChanged: (int? e) {
+                                      setState(() {
+                                        maxDegree = e!;
+                                        buildBTree(
+                                            values, choosedBuildTreeType);
+                                      });
+                                    },
+                                    icon: const Icon(Icons.arrow_downward),
+                                    elevation: 16,
+                                    style: const TextStyle(
+                                        color: Colors.deepPurple),
+                                    underline: Container(
+                                      height: 2,
+                                      color: Colors.deepPurpleAccent,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            )),
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                          alignment: Alignment.topLeft,
+                          child: Column(
+                            children: [
+                              Container(
+                                alignment: Alignment.topLeft,
+                                child: const Text(
+                                  "Choose Build Tree Method:",
+                                  textAlign: TextAlign.left,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              Container(
+                                alignment: Alignment.topLeft,
+                                child: DropdownButton(
+                                  value: choosedBuildTreeType,
+                                  items: BuildTreeTypeEnum.values
+                                      .map<DropdownMenuItem<BuildTreeTypeEnum>>(
+                                          (e) => DropdownMenuItem<
+                                                  BuildTreeTypeEnum>(
+                                              value: e,
+                                              child:
+                                                  Text(buildTreeTypeString(e))))
+                                      .toList(),
+                                  onChanged: setBuildTreeType,
+                                  icon: const Icon(Icons.arrow_downward),
+                                  elevation: 16,
+                                  style:
+                                      const TextStyle(color: Colors.deepPurple),
+                                  underline: Container(
+                                    height: 2,
+                                    color: Colors.deepPurpleAccent,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const Text("Choose Build Tree Method:"),
-                        DropdownButton(
-                          value: choosedBuildTreeType,
-                          items: BuildTreeTypeEnum.values
-                              .map<DropdownMenuItem<BuildTreeTypeEnum>>((e) =>
-                                  DropdownMenuItem<BuildTreeTypeEnum>(
-                                      value: e,
-                                      child: Text(buildTreeTypeString(e))))
-                              .toList(),
-                          onChanged: setBuildTreeType,
-                          icon: const Icon(Icons.arrow_downward),
-                          elevation: 16,
-                          style: const TextStyle(color: Colors.deepPurple),
-                          underline: Container(
-                            height: 2,
-                            color: Colors.deepPurpleAccent,
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                textStyle: const TextStyle(fontSize: 20)),
+                            onPressed: userChooseFile,
+                            child: const Text('Choose File'),
                           ),
-                        ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              textStyle: const TextStyle(fontSize: 20)),
-                          onPressed: userChooseFile,
-                          child: const Text('Choose File'),
                         ),
                       ],
                     ),
@@ -240,7 +295,7 @@ class BTreePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(BTreePainter oldDelegate) => false;
+  bool shouldRepaint(BTreePainter oldDelegate) => true;
 
   Size drawBoxText(Box box, Canvas canvas, Size cSize) {
     final textSpan = TextSpan(
