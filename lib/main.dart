@@ -32,12 +32,14 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   // Setting
   static const String _title = 'B+ Tree visualization';
+  ScrollController _scrollController = ScrollController();
 
   // states
   BuildTreeTypeEnum choosedBuildTreeType = BuildTreeTypeEnum.bottomUp;
   int maxDegree = 3;
   List<int> values = [];
   BTree? bTree;
+  double treeButtomWidth = 2000.0;
 
   // private method
   void setBuildTreeType(BuildTreeTypeEnum? buildTreeTypeEnum) {
@@ -87,6 +89,16 @@ class _MyAppState extends State<MyApp> {
         break;
     }
 
+    // draw b tree
+    List<List<Node>> levels = bTree.getLevel();
+    // draw bottom first
+    // 1. get bottom level total width
+    treeButtomWidth = -20.0;
+    int levelCnt = levels.length;
+    for (Node node in levels[levelCnt - 1]) {
+      treeButtomWidth += node.box!.size!.width + 20.0;
+    }
+
     setState(() {
       this.bTree = bTree;
     });
@@ -94,6 +106,12 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    _scrollController.animateTo(
+        (_scrollController.position.maxScrollExtent +
+                _scrollController.position.minScrollExtent) /
+            2,
+        duration: Duration(milliseconds: 500),
+        curve: Curves.ease);
     return MaterialApp(
       title: _title,
       theme: ThemeData(
@@ -219,10 +237,18 @@ class _MyAppState extends State<MyApp> {
                         color: Colors.brown[200],
                         child: (bTree == null)
                             ? Container()
-                            : CustomPaint(
-                                size: const Size(
-                                    double.infinity, double.infinity),
-                                painter: BTreePainter(bTree!),
+                            : Container(
+                                child: Center(
+                                  child: SingleChildScrollView(
+                                    controller: _scrollController,
+                                    scrollDirection: Axis.horizontal,
+                                    child: CustomPaint(
+                                      size: Size(treeButtomWidth + 100,
+                                          treeButtomWidth + 100),
+                                      painter: BTreePainter(bTree!),
+                                    ),
+                                  ),
+                                ),
                               ),
                       ),
                     ),
@@ -248,6 +274,7 @@ class BTreePainter extends CustomPainter {
 
   // state
   BTree bTree;
+  double treeButtomWidth = 2000.0;
 
   BTreePainter(this.bTree);
 
@@ -257,13 +284,13 @@ class BTreePainter extends CustomPainter {
     List<List<Node>> levels = bTree.getLevel();
     // draw bottom first
     // 1. get bottom level total width
-    double buttomWidth = -sideMargin;
+    treeButtomWidth = -sideMargin;
     int levelCnt = levels.length;
     for (Node node in levels[levelCnt - 1]) {
-      buttomWidth += node.box!.size!.width + sideMargin;
+      treeButtomWidth += node.box!.size!.width + sideMargin;
     }
     // 2. draw bottom level
-    double xOff = size.width / 2 - buttomWidth / 2;
+    double xOff = size.width / 2 - treeButtomWidth / 2;
     for (int i = 0; i < levels[levelCnt - 1].length; i++) {
       double preBoxWidth =
           (i != 0) ? levels[levelCnt - 1][i - 1].box!.size!.width : 0;
