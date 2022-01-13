@@ -106,13 +106,13 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    if (_scrollControllerH.hasClients)
-      _scrollControllerH.animateTo(
-          (_scrollControllerH.position.maxScrollExtent +
-                  _scrollControllerH.position.minScrollExtent) /
-              2,
-          duration: Duration(milliseconds: 500),
-          curve: Curves.ease);
+    // if (_scrollControllerH.hasClients)
+    //   _scrollControllerH.animateTo(
+    //       (_scrollControllerH.position.maxScrollExtent +
+    //               _scrollControllerH.position.minScrollExtent) /
+    //           2,
+    //       duration: Duration(milliseconds: 500),
+    //       curve: Curves.ease);
     return MaterialApp(
       title: _title,
       theme: ThemeData(
@@ -238,16 +238,19 @@ class _MyAppState extends State<MyApp> {
                         color: Colors.brown[200],
                         child: Container(
                           child: Center(
-                            child: SingleChildScrollView(
-                              controller: _scrollControllerH,
-                              scrollDirection: Axis.horizontal,
-                              child: (bTree == null)
-                                  ? Container()
-                                  : CustomPaint(
-                                      size: Size(treeButtomWidth + 100,
-                                          treeButtomWidth + 100),
-                                      painter: BTreePainter(bTree!),
-                                    ),
+                            child: Scrollbar(
+                              child: SingleChildScrollView(
+                                // controller: _scrollControllerH,
+                                primary: true,
+                                scrollDirection: Axis.horizontal,
+                                child: (bTree == null)
+                                    ? Container()
+                                    : CustomPaint(
+                                        size: Size(treeButtomWidth + 100,
+                                            treeButtomWidth + 100),
+                                        painter: BTreePainter(bTree!),
+                                      ),
+                              ),
                             ),
                           ),
                         ),
