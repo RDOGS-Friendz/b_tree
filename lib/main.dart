@@ -33,7 +33,6 @@ class _MyAppState extends State<MyApp> {
   // Setting
   static const String _title = 'B+ Tree visualization';
   ScrollController _scrollControllerH = ScrollController();
-  ScrollController _scrollControllerV = ScrollController();
 
   // states
   BuildTreeTypeEnum choosedBuildTreeType = BuildTreeTypeEnum.bottomUp;
@@ -237,21 +236,21 @@ class _MyAppState extends State<MyApp> {
                           horizontal: 40, vertical: 40),
                       child: Container(
                         color: Colors.brown[200],
-                        child: (bTree == null)
-                            ? Container()
-                            : Container(
-                                child: Center(
-                                  child: SingleChildScrollView(
-                                    controller: _scrollControllerH,
-                                    scrollDirection: Axis.horizontal,
-                                    child: CustomPaint(
+                        child: Container(
+                          child: Center(
+                            child: SingleChildScrollView(
+                              controller: _scrollControllerH,
+                              scrollDirection: Axis.horizontal,
+                              child: (bTree == null)
+                                  ? Container()
+                                  : CustomPaint(
                                       size: Size(treeButtomWidth + 100,
                                           treeButtomWidth + 100),
                                       painter: BTreePainter(bTree!),
                                     ),
-                                  ),
-                                ),
-                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   )
