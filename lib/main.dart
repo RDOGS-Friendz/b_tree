@@ -32,7 +32,8 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   // Setting
   static const String _title = 'B+ Tree visualization';
-  ScrollController _scrollController = ScrollController();
+  ScrollController _scrollControllerH = ScrollController();
+  ScrollController _scrollControllerV = ScrollController();
 
   // states
   BuildTreeTypeEnum choosedBuildTreeType = BuildTreeTypeEnum.bottomUp;
@@ -106,12 +107,13 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    _scrollController.animateTo(
-        (_scrollController.position.maxScrollExtent +
-                _scrollController.position.minScrollExtent) /
-            2,
-        duration: Duration(milliseconds: 500),
-        curve: Curves.ease);
+    if (_scrollControllerH.hasClients)
+      _scrollControllerH.animateTo(
+          (_scrollControllerH.position.maxScrollExtent +
+                  _scrollControllerH.position.minScrollExtent) /
+              2,
+          duration: Duration(milliseconds: 500),
+          curve: Curves.ease);
     return MaterialApp(
       title: _title,
       theme: ThemeData(
@@ -240,7 +242,7 @@ class _MyAppState extends State<MyApp> {
                             : Container(
                                 child: Center(
                                   child: SingleChildScrollView(
-                                    controller: _scrollController,
+                                    controller: _scrollControllerH,
                                     scrollDirection: Axis.horizontal,
                                     child: CustomPaint(
                                       size: Size(treeButtomWidth + 100,
