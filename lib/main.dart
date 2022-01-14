@@ -357,65 +357,6 @@ class _MyAppState extends State<MyApp> {
                                     ),
                                   ],
                                 ),
-                                // Row(
-                                //   children: [
-                                //     Container(
-                                //       alignment: Alignment.topLeft,
-                                //       margin: EdgeInsets.fromLTRB(25, 0, 0, 0),
-                                //       padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
-                                //       child: Container(
-                                //         width: 150,
-                                //         height: 38,
-                                //         child: TextField(
-                                //           textInputAction:
-                                //               TextInputAction.search,
-                                //           onSubmitted: (text) {
-                                //             insertNumber = int.tryParse(text);
-                                //             if (insertNumber != null) {
-                                //               if (bTree == null) {
-                                //                 bTree = BTree(this.maxDegree);
-                                //               }
-                                //               Add2ValueList(insertNumber!);
-                                //               bTree!.inSert(insertNumber!);
-                                //               drawTree(bTree!);
-                                //             }
-                                //           },
-                                //           onChanged: (text) {
-                                //             insertNumber = int.tryParse(text);
-                                //           },
-                                //           decoration: InputDecoration(
-                                //             contentPadding: EdgeInsets.fromLTRB(
-                                //                 10, 0, 0, 0),
-                                //             border: OutlineInputBorder(),
-                                //             hintText: 'Enter number...',
-                                //           ),
-                                //         ),
-                                //       ),
-                                //     ),
-                                //     Container(
-                                //       margin: EdgeInsets.fromLTRB(2, 0, 0, 0),
-                                //       height: 38,
-                                //       child: ElevatedButton(
-                                //         style: ElevatedButton.styleFrom(
-                                //             primary: Color(0xffcf7c30),
-                                //             textStyle: const TextStyle(
-                                //                 fontWeight: FontWeight.w600,
-                                //                 fontSize: 20)),
-                                //         onPressed: () {
-                                //           if (insertNumber != null) {
-                                //             if (bTree == null) {
-                                //               bTree = BTree(this.maxDegree);
-                                //             }
-                                //             Add2ValueList(insertNumber!);
-                                //             bTree!.inSert(insertNumber!);
-                                //             drawTree(bTree!);
-                                //           }
-                                //         },
-                                //         child: const Text('Delete'),
-                                //       ),
-                                //     ),
-                                //   ],
-                                // ),
                                 Container(
                                   margin: EdgeInsets.symmetric(vertical: 15),
                                   height: 40,

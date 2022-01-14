@@ -52,6 +52,22 @@ class BTree {
     //
   }
 
+  void ddd(Node oldNode) {
+    if (oldNode.values.length >= oldNode.order) {
+      var node1 = Node(oldNode.order);
+      node1.checkLeaf = oldNode.checkLeaf;
+      node1.parent = oldNode.parent;
+      int mid = (oldNode.values.length / 2.0).ceil() - 1;
+      node1.values = oldNode.values.sublist(mid + 1);
+      oldNode.values = oldNode.values.sublist(0, mid + 1);
+      insertInParent(oldNode, node1.values[0], node1);
+      ddd(oldNode);
+      ddd(node1);
+    }
+  }
+
+  void RightD(Node node) {}
+
   void bottomUp(List<int> values) {
     // sort
     List<int> tmp = List.from(values);
@@ -62,7 +78,10 @@ class BTree {
     Node oldNode = root!;
     oldNode.values = values;
 
-    while (oldNode.values.length >= oldNode.order) {
+    ddd(oldNode);
+    return;
+
+    if (oldNode.values.length >= oldNode.order) {
       var node1 = Node(oldNode.order);
       node1.checkLeaf = oldNode.checkLeaf;
       node1.parent = oldNode.parent;
