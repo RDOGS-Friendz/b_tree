@@ -80,12 +80,12 @@ class _MyAppState extends State<MyApp> {
       }
 
       // action of after choose file
-      buildBTree(data, choosedBuildTreeType);
       setState(() {
         values.clear();
         for (int i in data) {
           Add2ValueList(i);
         }
+        buildBTree(data, choosedBuildTreeType);
       });
     } else {
       // User canceled the picker
