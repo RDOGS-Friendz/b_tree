@@ -82,7 +82,10 @@ class _MyAppState extends State<MyApp> {
       // action of after choose file
       buildBTree(data, choosedBuildTreeType);
       setState(() {
-        values = data;
+        values.clear();
+        for (int i in data) {
+          Add2ValueList(i);
+        }
       });
     } else {
       // User canceled the picker
@@ -98,6 +101,11 @@ class _MyAppState extends State<MyApp> {
       this.bTree = null;
       return;
     }
+    List<int> tmp = [];
+    for (int i in values) {
+      if (tmp.contains(i) == false) tmp.add(i);
+    }
+    values = tmp;
     BTree bTree = BTree(maxDegree);
     switch (buildTreeType) {
       case BuildTreeTypeEnum.oneByOne:
