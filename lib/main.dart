@@ -22,6 +22,8 @@ String buildTreeTypeString(BuildTreeTypeEnum buildTreeType) {
   }
 }
 
+List<int> values = [];
+
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -33,13 +35,17 @@ class _MyAppState extends State<MyApp> {
   // Setting
   static const String _title = 'B+ Tree visualization';
   ScrollController _scrollControllerH = ScrollController();
+  Color primaryColor = Color(0xff198964);
+  Color backgroundColor = Color(0xfff5f7f3);
+  Color ColorsecondaryBackgroundColor = Color(0xffe9f6e2);
+  Color ColortextColor = Color(0xff262730);
 
   // states
   BuildTreeTypeEnum choosedBuildTreeType = BuildTreeTypeEnum.bottomUp;
   int maxDegree = 3;
-  List<int> values = [];
   BTree? bTree;
   double treeButtomWidth = 2000.0;
+  int? insertNumber;
 
   // private method
   void setBuildTreeType(BuildTreeTypeEnum? buildTreeTypeEnum) {
@@ -58,9 +64,20 @@ class _MyAppState extends State<MyApp> {
         path = path.substring(21);
       }
       File file = File(path);
-      String dataStr = (await file.readAsString());
-      List<int> data =
-          dataStr.split(" ").map<int>((e) => int.parse(e)).toList();
+      String dataStr = (await file.readAsString()).trim();
+      List<int> data1 = dataStr.split(" ").map<int>((e) {
+        int? tmp = int.tryParse(e);
+        if (tmp != null) {
+          return tmp;
+        } else {
+          return -999;
+        }
+      }).toList();
+
+      List<int> data = [];
+      for (var i in data1) {
+        if (i != -999) data.add(i);
+      }
 
       // action of after choose file
       buildBTree(data, choosedBuildTreeType);
@@ -70,6 +87,10 @@ class _MyAppState extends State<MyApp> {
     } else {
       // User canceled the picker
     }
+  }
+
+  void Add2ValueList(int num) {
+    if (values.contains(num) == false) values.add(num);
   }
 
   void buildBTree(List<int> values, BuildTreeTypeEnum buildTreeType) {
@@ -89,6 +110,11 @@ class _MyAppState extends State<MyApp> {
         break;
     }
 
+    // draw b tree
+    drawTree(bTree);
+  }
+
+  void drawTree(BTree bTree) {
     // draw b tree
     List<List<Node>> levels = bTree.getLevel();
     // draw bottom first
@@ -124,6 +150,7 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         appBar: AppBar(
           title: const Text(_title),
+          backgroundColor: backgroundColor,
         ),
         body: Column(
           children: [
@@ -132,25 +159,39 @@ class _MyAppState extends State<MyApp> {
                 children: [
                   Container(
                     // left container
+
                     width: 300.0,
                     height: double.infinity,
-                    color: Colors.orange[200],
+                    color: ColorsecondaryBackgroundColor,
                     child: Column(
                       children: [
                         Container(
                             padding: const EdgeInsets.fromLTRB(30, 20, 20, 20),
-                            child: Row(
+                            child: Column(
                               children: [
-                                const Text(
-                                  "Choose Max. Degree:",
-                                  textAlign: TextAlign.center,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
+                                LeftTitle(Icons.settings, "Tree Setting"),
+                                Container(
+                                  alignment: Alignment.topLeft,
+                                  margin: EdgeInsets.only(top: 5),
+                                  child: const Text(
+                                    "Choose Max. Degree:",
+                                    textAlign: TextAlign.center,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                 ),
                                 Container(
-                                  padding: EdgeInsets.only(left: 10.0),
+                                  padding: EdgeInsets.fromLTRB(13, 0, 13, 4),
+                                  margin: EdgeInsets.symmetric(vertical: 10),
+                                  decoration: BoxDecoration(
+                                      color: backgroundColor,
+                                      // border: Border.all(color: Colors.black),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(5))),
                                   child: DropdownButton(
+                                    isExpanded: true,
                                     value: maxDegree,
                                     items: [3, 4, 5, 6, 7]
                                         .map<DropdownMenuItem<int>>((e) =>
@@ -167,10 +208,13 @@ class _MyAppState extends State<MyApp> {
                                     icon: const Icon(Icons.arrow_downward),
                                     elevation: 16,
                                     style: const TextStyle(
-                                        color: Colors.deepPurple),
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black,
+                                        fontSize: 18),
                                     underline: Container(
                                       height: 2,
-                                      color: Colors.deepPurpleAccent,
+                                      // color: Colors.deepPurpleAccent,
+                                      color: ColortextColor,
                                     ),
                                   ),
                                 )
@@ -182,18 +226,33 @@ class _MyAppState extends State<MyApp> {
                           child: Column(
                             children: [
                               Container(
+                                  alignment: Alignment.topLeft,
+                                  margin: EdgeInsets.fromLTRB(0, 0, 26, 7),
+                                  // width: 200,
+                                  child: LeftTitle(
+                                      Icons.file_download, "Bulk input")),
+                              Container(
                                 alignment: Alignment.topLeft,
                                 child: const Text(
                                   "Choose Build Tree Method:",
                                   textAlign: TextAlign.left,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                               Container(
+                                padding: EdgeInsets.fromLTRB(13, 0, 13, 4),
+                                margin: EdgeInsets.fromLTRB(0, 10, 25, 10),
+                                decoration: BoxDecoration(
+                                    color: backgroundColor,
+                                    // border: Border.all(color: Colors.black),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5))),
                                 alignment: Alignment.topLeft,
                                 child: DropdownButton(
+                                  isExpanded: true,
                                   value: choosedBuildTreeType,
                                   items: BuildTreeTypeEnum.values
                                       .map<DropdownMenuItem<BuildTreeTypeEnum>>(
@@ -206,11 +265,12 @@ class _MyAppState extends State<MyApp> {
                                   onChanged: setBuildTreeType,
                                   icon: const Icon(Icons.arrow_downward),
                                   elevation: 16,
-                                  style:
-                                      const TextStyle(color: Colors.deepPurple),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black),
                                   underline: Container(
                                     height: 2,
-                                    color: Colors.deepPurpleAccent,
+                                    color: ColortextColor,
                                   ),
                                 ),
                               ),
@@ -218,12 +278,105 @@ class _MyAppState extends State<MyApp> {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+                          padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                          height: 43,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                                textStyle: const TextStyle(fontSize: 20)),
+                                primary: primaryColor,
+                                textStyle: const TextStyle(
+                                    fontWeight: FontWeight.w600, fontSize: 20)),
                             onPressed: userChooseFile,
                             child: const Text('Choose File'),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            // color: Colors.white,
+                            child: Column(
+                              children: [
+                                Container(
+                                    padding: EdgeInsets.fromLTRB(30, 20, 25, 0),
+                                    child: LeftTitle(Icons.input, "UserInput")),
+                                Row(
+                                  children: [
+                                    Container(
+                                      alignment: Alignment.topLeft,
+                                      margin: EdgeInsets.fromLTRB(25, 0, 0, 0),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 8),
+                                      child: Container(
+                                        width: 150,
+                                        height: 43,
+                                        child: TextField(
+                                          textInputAction:
+                                              TextInputAction.search,
+                                          onSubmitted: (text) {
+                                            insertNumber = int.tryParse(text);
+                                            if (insertNumber != null) {
+                                              if (bTree == null) {
+                                                bTree = BTree(this.maxDegree);
+                                              }
+                                              Add2ValueList(insertNumber!);
+                                              bTree!.inSert(insertNumber!);
+                                              drawTree(bTree!);
+                                            }
+                                          },
+                                          onChanged: (text) {
+                                            insertNumber = int.tryParse(text);
+                                          },
+                                          decoration: InputDecoration(
+                                            border: OutlineInputBorder(),
+                                            hintText: 'Enter number',
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.fromLTRB(2, 0, 0, 0),
+                                      height: 43,
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            primary: primaryColor,
+                                            textStyle: const TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 20)),
+                                        onPressed: () {
+                                          if (insertNumber != null) {
+                                            if (bTree == null) {
+                                              bTree = BTree(this.maxDegree);
+                                            }
+                                            Add2ValueList(insertNumber!);
+                                            bTree!.inSert(insertNumber!);
+                                            drawTree(bTree!);
+                                          }
+                                        },
+                                        child: const Text('Insert'),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Container(
+                                  margin: EdgeInsets.symmetric(vertical: 15),
+                                  height: 40,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        primary: Color(0xffcf7c30),
+                                        textStyle: const TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 20)),
+                                    onPressed: () {
+                                      values = [];
+                                      bTree = null;
+                                      setState(() {
+                                        buildBTree(
+                                            values, choosedBuildTreeType);
+                                      });
+                                    },
+                                    child: const Text('Clear'),
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -231,11 +384,11 @@ class _MyAppState extends State<MyApp> {
                   ),
                   Expanded(
                     child: Container(
-                      color: Colors.orange[100],
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 40, vertical: 40),
+                      color: backgroundColor,
+                      // padding: const EdgeInsets.symmetric(
+                      //     horizontal: 40, vertical: 40),
                       child: Container(
-                        color: Colors.brown[200],
+                        color: backgroundColor,
                         child: Container(
                           child: Center(
                             child: Scrollbar(
@@ -263,6 +416,40 @@ class _MyAppState extends State<MyApp> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class LeftTitle extends StatelessWidget {
+  LeftTitle(this.icon, this.title, {Key? key}) : super(key: key);
+  IconData icon;
+  String title;
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Container(
+              margin: EdgeInsets.only(right: 10),
+              child: Icon(
+                icon,
+                size: 30,
+              ),
+            ),
+            Container(
+              child: Text(
+                title,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 23),
+              ),
+            ),
+          ],
+        ),
+        Divider(
+          thickness: 2,
+        ),
+      ],
     );
   }
 }

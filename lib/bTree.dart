@@ -48,9 +48,46 @@ class BTree {
     root!.checkLeaf = true;
   }
 
+  void buttomInsertInParent(Node oldNode, int value, Node node1) {
+    //
+  }
+
   void bottomUp(List<int> values) {
     // sort
+    List<int> tmp = List.from(values);
     values.sort();
+
+    root = Node(order);
+    root!.checkLeaf = true;
+    Node oldNode = root!;
+    oldNode.values = values;
+
+    while (oldNode.values.length >= oldNode.order) {
+      var node1 = Node(oldNode.order);
+      node1.checkLeaf = oldNode.checkLeaf;
+      node1.parent = oldNode.parent;
+      int mid = (oldNode.values.length / 2.0).ceil() - 1;
+      node1.values = oldNode.values.sublist(mid + 1);
+      oldNode.values = oldNode.values.sublist(0, mid + 1);
+      insertInParent(oldNode, node1.values[0], node1);
+
+      while (node1.values.length >= oldNode.order) {
+        var node2 = Node(node1.order);
+        node2.checkLeaf = node1.checkLeaf;
+        node2.parent = node1.parent;
+        int mid = (node1.values.length / 2.0).ceil() - 1;
+        node2.values = node1.values.sublist(mid + 1);
+        node1.values = oldNode.values.sublist(0, mid + 1);
+        insertInParent(node1, node2.values[0], node2);
+      }
+    }
+    return;
+
+    // for (var i in tmp) {
+    //   inSert(i);
+    // }
+
+    // return;
 
     // buttom nodes
     List<Node> buttomNodes = [Node(order)];
@@ -94,6 +131,8 @@ class BTree {
         break;
       }
     }
+
+    values = tmp;
   }
 
   void inSert(int v) {
@@ -150,7 +189,9 @@ class BTree {
         if (parentNode.keys.length > parentNode.order) {
           Node parentDash = Node(parentNode.order);
           parentDash.parent = parentNode.parent;
-          int mid = (parentNode.order / 2.0).ceil() - 1;
+          int mid = (parentNode.order.isOdd)
+              ? (parentNode.order / 2.0).ceil() - 1
+              : (parentNode.order / 2.0).ceil();
           parentDash.values = parentNode.values.sublist(mid + 1);
           parentDash.keys = parentNode.keys.sublist(mid + 1);
           int valueDash = parentNode.values[mid];
