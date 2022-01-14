@@ -306,7 +306,7 @@ class _MyAppState extends State<MyApp> {
                                           horizontal: 8, vertical: 8),
                                       child: Container(
                                         width: 150,
-                                        height: 43,
+                                        height: 38,
                                         child: TextField(
                                           textInputAction:
                                               TextInputAction.search,
@@ -325,15 +325,17 @@ class _MyAppState extends State<MyApp> {
                                             insertNumber = int.tryParse(text);
                                           },
                                           decoration: InputDecoration(
+                                            contentPadding: EdgeInsets.fromLTRB(
+                                                10, 0, 0, 0),
                                             border: OutlineInputBorder(),
-                                            hintText: 'Enter number',
+                                            hintText: 'Enter number...',
                                           ),
                                         ),
                                       ),
                                     ),
                                     Container(
                                       margin: EdgeInsets.fromLTRB(2, 0, 0, 0),
-                                      height: 43,
+                                      height: 38,
                                       child: ElevatedButton(
                                         style: ElevatedButton.styleFrom(
                                             primary: primaryColor,
@@ -355,12 +357,71 @@ class _MyAppState extends State<MyApp> {
                                     ),
                                   ],
                                 ),
+                                // Row(
+                                //   children: [
+                                //     Container(
+                                //       alignment: Alignment.topLeft,
+                                //       margin: EdgeInsets.fromLTRB(25, 0, 0, 0),
+                                //       padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+                                //       child: Container(
+                                //         width: 150,
+                                //         height: 38,
+                                //         child: TextField(
+                                //           textInputAction:
+                                //               TextInputAction.search,
+                                //           onSubmitted: (text) {
+                                //             insertNumber = int.tryParse(text);
+                                //             if (insertNumber != null) {
+                                //               if (bTree == null) {
+                                //                 bTree = BTree(this.maxDegree);
+                                //               }
+                                //               Add2ValueList(insertNumber!);
+                                //               bTree!.inSert(insertNumber!);
+                                //               drawTree(bTree!);
+                                //             }
+                                //           },
+                                //           onChanged: (text) {
+                                //             insertNumber = int.tryParse(text);
+                                //           },
+                                //           decoration: InputDecoration(
+                                //             contentPadding: EdgeInsets.fromLTRB(
+                                //                 10, 0, 0, 0),
+                                //             border: OutlineInputBorder(),
+                                //             hintText: 'Enter number...',
+                                //           ),
+                                //         ),
+                                //       ),
+                                //     ),
+                                //     Container(
+                                //       margin: EdgeInsets.fromLTRB(2, 0, 0, 0),
+                                //       height: 38,
+                                //       child: ElevatedButton(
+                                //         style: ElevatedButton.styleFrom(
+                                //             primary: Color(0xffcf7c30),
+                                //             textStyle: const TextStyle(
+                                //                 fontWeight: FontWeight.w600,
+                                //                 fontSize: 20)),
+                                //         onPressed: () {
+                                //           if (insertNumber != null) {
+                                //             if (bTree == null) {
+                                //               bTree = BTree(this.maxDegree);
+                                //             }
+                                //             Add2ValueList(insertNumber!);
+                                //             bTree!.inSert(insertNumber!);
+                                //             drawTree(bTree!);
+                                //           }
+                                //         },
+                                //         child: const Text('Delete'),
+                                //       ),
+                                //     ),
+                                //   ],
+                                // ),
                                 Container(
                                   margin: EdgeInsets.symmetric(vertical: 15),
                                   height: 40,
                                   child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                        primary: Color(0xffcf7c30),
+                                        primary: Color(0xffBF3008),
                                         textStyle: const TextStyle(
                                             fontWeight: FontWeight.w600,
                                             fontSize: 20)),
@@ -397,7 +458,9 @@ class _MyAppState extends State<MyApp> {
                                 primary: true,
                                 scrollDirection: Axis.horizontal,
                                 child: (bTree == null)
-                                    ? Container()
+                                    ? Container(
+                                        child: ManualPage(),
+                                      )
                                     : CustomPaint(
                                         size: Size(treeButtomWidth + 100,
                                             treeButtomWidth + 100),
@@ -415,6 +478,71 @@ class _MyAppState extends State<MyApp> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class ManualPage extends StatelessWidget {
+  const ManualPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: EdgeInsets.all(100),
+        alignment: Alignment.center,
+        child: Column(
+          children: [
+            Text(
+              "Manual",
+              style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+            ),
+            Text("This app is a tool for visualize B+ tree",
+                style: TextStyle(fontSize: 20)),
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+                width: 500,
+                // color: Colors.white,
+                alignment: Alignment.topLeft,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Build tree method explain:",
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w600)),
+                    Text(
+                        "- One by One: insert list of integer in file to btree one by one\n- Bottom Up: first sort the integers in file then use the characteristic of sorted list to optimize build tree",
+                        style: TextStyle(
+                            fontSize: 17, fontWeight: FontWeight.w400)),
+                    Text("\nBulk input file format:",
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w600)),
+                    Text(
+                        "     csv file contain integer seperate by white space",
+                        style: TextStyle(
+                            fontSize: 17, fontWeight: FontWeight.w400)),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class MyBullet extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return new Container(
+      decoration: new BoxDecoration(
+        color: Colors.black,
+        shape: BoxShape.circle,
       ),
     );
   }
